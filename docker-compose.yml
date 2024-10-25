@@ -1,0 +1,11 @@
+version: '3'
+services:
+  ubuntu_service:
+    image: my_app_ubuntu
+    volumes:
+      - ./your_script.py:/app/your_script.py
+
+  alpine_service:
+    image: my_app_alpine
+    volumes:
+      - ./your_script.py:/app/your_script.py
