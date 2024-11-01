@@ -2,7 +2,7 @@ FROM python:3.8-slim
 RUN pip install numpy flask -i https://pypi.tuna.tsinghua.edu.cn/simple
 COPY ics_security/plc_simulator.py /app/plc_simulation.py
 WORKDIR /app
-EXPOSE 5000
-ENV DCS_NAME="DCS2"
-ENV DETECTION_RATES='{"malware": 0.9, "phishing": 0.15, "ransomware": 0.75, "DDoS": 0.9, "unknown": 0.2}'
+EXPOSE 5004
+ENV DCS_NAME="RedundantPLC"
+ENV DETECTION_RATES='{"malware": 0.7, "phishing": 0.7, "ransomware": 0.7, "DDoS": 0.7, "unknown": 0.3}'
 CMD ["python", "plc_simulation.py"]
