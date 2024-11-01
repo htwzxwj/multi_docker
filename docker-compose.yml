@@ -1,0 +1,15 @@
+# docker-compose.yml
+version: '3'
+services:
+  dcs1:
+    build:
+      context: .
+      dockerfile: Dockerfile.DCS1
+    container_name: dcs1_container
+    
+  dcs2:
+    build:
+      context: .
+      dockerfile: Dockerfile.DCS2
+    container_name: dcs2_container
+

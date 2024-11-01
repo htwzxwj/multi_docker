@@ -1,0 +1,16 @@
+# Base image
+FROM python:3.8-slim
+
+# Install dependencies
+RUN pip install numpy -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# Copy the code and specific configuration for DCS1
+COPY ics_security/plc_simulator.py /app/plc_simulation.py
+WORKDIR /app
+
+# Define the environment variables to set DCS-specific configuration
+ENV DCS_NAME="DCS1"
+ENV DETECTION_RATES='{"malware": 0.1, "phishing": 0.9, "ransomware": 0.8, "DDoS": 0.95, "unknown": 0.3}'
+
+# Run the simulation
+CMD ["python", "plc_simulation.py"]

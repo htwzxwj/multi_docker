@@ -1,0 +1,7 @@
+FROM python:3.8-slim
+RUN pip install numpy -i https://pypi.tuna.tsinghua.edu.cn/simple
+COPY ics_security/plc_simulator.py /app/plc_simulation.py
+WORKDIR /app
+ENV DCS_NAME="DCS2"
+ENV DETECTION_RATES='{"malware": 0.9, "phishing": 0.15, "ransomware": 0.75, "DDoS": 0.9, "unknown": 0.2}'
+CMD ["python", "plc_simulation.py"]
