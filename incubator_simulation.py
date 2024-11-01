@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
-import time
-import threading
+import random
 
 # 恒温箱类
 class Incubator:
@@ -50,6 +49,44 @@ def decrease_temperature():
 def check_temperature():
     result = incubator.check_temperature()
     return jsonify(result)
+
+@app.route('/simulate_attack', methods=['POST'])
+def simulate_attack():
+    attack_success = request.json.get("attack", False)
+    temperature = incubator.temperature
+    response_data = {}
+
+    if attack_success:
+        if temperature > incubator.max_temp:
+            # 温度高了继续升高温度
+            print(f"Detected high temperature: {temperature}°C. Sending command to increase temperature (risky).")
+            response_data = incubator.increase_temperature()
+        elif temperature < incubator.min_temp: 
+             # 温度低了降低温度
+            print(f"Detected low temperature: {temperature}°C. Sending command to decrease temperature (risky).")
+            response_data = incubator.decrease_temperature()
+        else:
+            # 随机选择升高或降低温度
+            action = random.choice(["increase", "decrease"])
+            print(f"Being attacked: {temperature}°C. Sending command to {action} temperature.")
+            if action == "increase":
+                response_data = incubator.increase_temperature()
+            else:
+                response_data = incubator.decrease_temperature()
+        return jsonify({"status": "attack", "message": "Attack successful. Temperature control compromised.", **response_data})
+    else:
+        if temperature > incubator.max_temp:
+            print(f"Detected high temperature: {temperature}°C. Sending command to decrease temperature.")
+            response_data = incubator.decrease_temperature()
+        elif temperature < incubator.min_temp:
+            print(f"Detected low temperature: {temperature}°C. Sending command to increase temperature.")
+            response_data = incubator.increase_temperature()
+        else:
+            print(f"Detected normal temperature: {temperature}°C. No action needed.")
+            response_data = {"status": "normal", "message": "Temperature within acceptable range."}
+        
+        return jsonify(response_data)
+
 
 if __name__ == "__main__":
     # 在后台运行 Flask 应用
