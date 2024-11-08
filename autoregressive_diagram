@@ -1,0 +1,55 @@
+digraph autoregressive {
+	rankdir=TB size="8,5"
+	subgraph cluster_0 {
+		label="Left Diagram"
+		s [label="[s]" color=lightgrey shape=square style=filled]
+		6 [label="" color=orange shape=square style=filled]
+		1 [color=mediumpurple shape=square style=filled]
+		2 [color=mediumpurple shape=square style=filled]
+		3 [color=mediumpurple shape=square style=filled]
+		4 [color=mediumpurple shape=square style=filled]
+		5 [color=mediumpurple shape=square style=filled]
+		s -> 1
+		s -> 2
+		s -> 3
+		s -> 4
+		s -> 5
+		1 -> 6
+		2 -> 6
+		3 -> 6
+		4 -> 6
+		5 -> 6
+		l1 [label=loss shape=plaintext]
+		1 -> l1
+		l2 [label=loss shape=plaintext]
+		2 -> l2
+		l3 [label=loss shape=plaintext]
+		3 -> l3
+		l4 [label=loss shape=plaintext]
+		4 -> l4
+		l5 [label=loss shape=plaintext]
+		5 -> l5
+	}
+	subgraph cluster_1 {
+		label="Right Diagram"
+		m [label="[m]" color=lightgrey shape=square style=filled]
+		r6 [label="" color=orange shape=square style=filled]
+		r1 [label=1 color=mediumpurple shape=square style=filled]
+		r2 [label=2 color=mediumpurple shape=square style=filled]
+		r3 [label=3 color=mediumpurple shape=square style=filled]
+		r4 [label=4 color=mediumpurple shape=square style=filled]
+		r5 [label=5 color=mediumpurple shape=square style=filled]
+		r1 -> r6
+		m -> r1
+		r2 -> r6
+		m -> r2
+		r3 -> r6
+		m -> r3
+		r4 -> r6
+		m -> r4
+		r5 -> r6
+		m -> r5
+		loss [label=loss shape=plaintext]
+		r6 -> loss
+	}
+}
