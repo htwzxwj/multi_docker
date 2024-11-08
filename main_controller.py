@@ -1,6 +1,9 @@
-import requests
-import time
-import random
+"""
+This script simulates the main controller that sends attack requests to the DCSs and triggers the incubator service to simulate the attack. It also calculates the security metrics based on the DCS responses and the incubator service's response.
+
+Author: Shiwei Zhou, Yuchen Qiang, Yushi Tao, Zhuo Ma
+"""
+import csv, time, requests, random
 
 dcs_urls = {
     "dcs1": "http://localhost:5001/simulate_attack",
@@ -39,19 +42,20 @@ def send_attack_requests(attack_type=["malware"]):
         try:
             response_time_start = time.time()
             response = requests.post(url, json=payload)
-            response_time_end = time.time()
+            
 
             if response.status_code == 200:
                 data = response.json()
                 name = data['dcs_name']   
+                response_time_end = time.time()
                 print(f"[{name}] 攻击类型: {data['attack_type']}, 在线状态: {data['online_status']}，检测概率: {data['detection_result']}")
                 if data['online_status'] and data['detection_result']:  # DCS没有被攻击
                     uptime += response_time_end - response_time_start
 
                     if failure_start_time is not None:
-                        downtime += response_time_start - failure_start_time
+                        downtime += time.time() - failure_start_time
                         failure_start_time = None
-                        total_recoveries += 1  
+                    total_recoveries += 1  
 
                     predited_attack_type = detection_result_to_attack_type(data['detection_result'])  # 如果DCS在线状态为 true
                     print(f"[{name}]识别出的攻击类型: {predited_attack_type}")
@@ -65,8 +69,8 @@ def send_attack_requests(attack_type=["malware"]):
                     # 重启设备的逻辑（假设有一个重启设备的函数）
 
                     if failure_start_time is None: # DCS离线实现记录故障开始时间
-                        failure_start_time = response_time_start
-                    total_failures += 1
+                        failure_start_time = response_time_end
+                    
                     # 尝试使用冗余DCS
                     redundant_response = requests.post(redundant_url["redundant"], json=payload)
                     if redundant_response.status_code == 200:
@@ -83,9 +87,11 @@ def send_attack_requests(attack_type=["malware"]):
                             if predited_attack_type == attack_type:
                                 print(f"[{name}] 识别成功")
                                 result += 1
+                            uptime+= time.time() - recovery_start_time
 
                         if not redundant_data['online_status']:
                             print(f"[{name}] 冗余DCS在线状态为false，攻击有效")
+                            total_failures += 1
                         # 将冗余DCS加入dcs_urls中
                         dcs_urls[f"{name}"] = redundant_url["redundant"]
                         # 从dcs_urls中删除当前的url
@@ -115,7 +121,11 @@ def trigger_attack(attack_success):
         # 检查响应状态并解析返回的 JSON 数据
         if response.status_code == 200:
             data = response.json()
-            print(f"Response: {data['status']}, {data['message']}")
+            print(f"Response: {data['status']}, {data['message'], data['temperature']}")
+
+            with open('temperature_data.csv', mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([data['temperature']])
         else:
             print(f"Failed to trigger attack. Status code: {response.status_code}")
     except requests.exceptions.RequestException as e:
@@ -136,27 +146,28 @@ if __name__ == "__main__":
     while True:
         attack_type = random.choice(attack_types)
         result = send_attack_requests(attack_type=attack_type)
-        attack_success =  int(result <= 1)
+        attack_success =  int(result <= 2)
         trigger_attack(attack_success)
         metrics = calculate_metrics()
         print(f"安全性指标: {metrics}")
         # 统计指标的平均值
         total_metrics = {"MTTF": 0, "MTTR": 0, "Availability": 0}
-        iterations = 1  # 假设我们运行10次来计算平均值
+        iterations = 50
 
         for _ in range(iterations):
             attack_type = random.choice(attack_types)
             result = send_attack_requests(attack_type=attack_type)
-            attack_success = int(result <= 1)
+            attack_success = int(result <= 2)
             trigger_attack(attack_success)
             metrics = calculate_metrics()
             total_metrics["MTTF"] += metrics["MTTF"]
             total_metrics["MTTR"] += metrics["MTTR"]
             total_metrics["Availability"] += metrics["Availability"]
-            time.sleep(1)  # 每 1 秒发送一次请求
+            time.sleep(0.1)
 
         # 计算平均值
         average_metrics = {key: value / iterations for key, value in total_metrics.items()}
         print(f"平均安全性指标: {average_metrics}")
-        time.sleep(1)  # 每 5 秒发送一次请求
+        # time.sleep(1)  # 每 5 秒发送一次请求
+
         break

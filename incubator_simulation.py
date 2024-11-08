@@ -21,34 +21,34 @@ class Incubator:
 
     def check_temperature(self):
         if self.temperature < self.min_temp:
-            return {"status": "warning", "message": f"Temperature {self.temperature}°C is below the minimum threshold."}
+            return {"status": "warning", "temperature":f"{self.temperature}","message": f"Temperature {self.temperature}°C is below the minimum threshold."}
         elif self.temperature > self.max_temp:
-            return {"status": "warning", "message": f"Temperature {self.temperature}°C is above the maximum threshold."}
+            return {"status": "warning","temperature":f"{self.temperature}", "message": f"Temperature {self.temperature}°C is above the maximum threshold."}
         else:
-            return {"status": "normal", "message": f"Temperature {self.temperature}°C is within acceptable range."}
+            return {"status": "normal","temperature":f"{self.temperature}", "message": f"Temperature {self.temperature}°C is within acceptable range."}
 
 # 创建 Flask 应用
 app = Flask(__name__)
 incubator = Incubator(initial_temperature=37.0)
 
-@app.route('/temperature', methods=['GET'])
-def get_temperature():
-    return jsonify({"temperature": incubator.temperature})
+# @app.route('/temperature', methods=['GET'])
+# def get_temperature():
+#     return jsonify({"temperature": incubator.temperature})
 
-@app.route('/increase_temperature', methods=['POST'])
-def increase_temperature():
-    result = incubator.increase_temperature()
-    return jsonify(result)
+# @app.route('/increase_temperature', methods=['POST'])
+# def increase_temperature():
+#     result = incubator.increase_temperature()
+#     return jsonify(result)
 
-@app.route('/decrease_temperature', methods=['POST'])
-def decrease_temperature():
-    result = incubator.decrease_temperature()
-    return jsonify(result)
+# @app.route('/decrease_temperature', methods=['POST'])
+# def decrease_temperature():
+#     result = incubator.decrease_temperature()
+#     return jsonify(result)
 
-@app.route('/check_temperature', methods=['GET'])
-def check_temperature():
-    result = incubator.check_temperature()
-    return jsonify(result)
+# @app.route('/check_temperature', methods=['GET'])
+# def check_temperature():
+#     result = incubator.check_temperature()
+#     return jsonify(result)
 
 @app.route('/simulate_attack', methods=['POST'])
 def simulate_attack():
@@ -83,9 +83,9 @@ def simulate_attack():
             response_data = incubator.increase_temperature()
         else:
             print(f"Detected normal temperature: {temperature}°C. No action needed.")
-            response_data = {"status": "normal", "message": "Temperature within acceptable range."}
+            response_data = {"status": "normal", "temperature":f"{incubator.temperature}","message": "Temperature within acceptable range."}
         
-        return jsonify(response_data)
+    return jsonify(response_data)
 
 
 if __name__ == "__main__":
