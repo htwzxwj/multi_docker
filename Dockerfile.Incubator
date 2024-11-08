@@ -1,14 +1,6 @@
-# 使用 Python 基础镜像
 FROM python:3.8-slim
-
-# 安装 Flask
 RUN pip install flask -i https://pypi.tuna.tsinghua.edu.cn/simple
-
-# 拷贝恒温箱代码到容器中
 COPY incubator_simulation.py /app/incubator_simulation.py
 WORKDIR /app
-
 EXPOSE 5005
-
-# 运行 Flask 应用
 CMD ["python", "incubator_simulation.py"]
