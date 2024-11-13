@@ -152,7 +152,7 @@ if __name__ == "__main__":
         print(f"安全性指标: {metrics}")
         # 统计指标的平均值
         total_metrics = {"MTTF": 0, "MTTR": 0, "Availability": 0}
-        iterations = 50
+        iterations = 1
 
         for _ in range(iterations):
             attack_type = random.choice(attack_types)
@@ -168,6 +168,7 @@ if __name__ == "__main__":
         # 计算平均值
         average_metrics = {key: value / iterations for key, value in total_metrics.items()}
         print(f"平均安全性指标: {average_metrics}")
+        print("*"*40)
         # time.sleep(1)  # 每 5 秒发送一次请求
 
         break
