@@ -171,10 +171,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-    <p>
-        <strong>队伍名称</strong>: 设计安全小分队<br>
-        <strong>队员</strong>: 马卓、周石伟、强宇琛、陶羽石
-    </p>
+    <div class='centered'>
+        <p>
+            <strong>队伍名称</strong>: 设计安全小分队<br>
+            <strong>队员</strong>: 马卓、周石伟、强宇琛、陶羽石
+        </p>
+    </div>
 """, unsafe_allow_html=True)
 
 # 添加分隔线
