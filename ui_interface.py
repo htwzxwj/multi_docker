@@ -120,26 +120,62 @@ dcs_modules = [
     DCS(detection_rates={"malware": 0.1, "phishing": 0.9, "ransomware": 0.8, "DDoS": 0.95, "unknown": 0.3}, name="DCS1"),
     DCS(detection_rates={"malware": 0.9, "phishing": 0.15, "ransomware": 0.75, "DDoS": 0.9, "unknown": 0.2}, name="DCS2"),
     DCS(detection_rates={"malware": 0.8, "phishing": 0.85, "ransomware": 0.1, "DDoS": 0.85, "unknown": 0.2}, name="DCS3"),
-    # DCS(detection_rates={"malware": 0.5, "phishing": 0.5, "ransomware": 0.5, "DDoS": 0.5, "unknown": 0.3}, name="DCS4")
 ]
 
-redundant_dcs = DCS(detection_rates={"malware": 0.5, "phishing": 0.5, "ransomware": 0.5, "DDoS": 0.5, "unknown": 0.3}, name="RedundantPLC")
+redundant_dcs = DCS(detection_rates={"malware": 0.5, "phishing": 0.5, "ransomware": 0.5, "DDoS": 0.5, "unknown": 0.3}, name="RedundantDCS")
 
-# Streamlit UI
-st.title("第七届\"强网\"拟态防御国际精英挑战赛设计安全赛--现场答辩演示程序")
+
+
+st.markdown("""
+    <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header img {
+            height: 100px;
+        }
+    </style>
+    <div class='header'>
+        <img src="https://cdn.jsdelivr.net/gh/htwzxwj/image/1417312908.png" alt="左侧图片">
+        <img src="https://cdn.jsdelivr.net/gh/htwzxwj/image/SJYlogo.jpg" alt="右侧图片">
+    </div>
+""", unsafe_allow_html=True)
+
+
+st.markdown("""
+    <style>
+        .centered {
+            text-align: center;
+        }
+        .left-align {
+            text-align: left;
+        }
+    </style>
+    <div class='centered'>
+        <h1 style='font-family: SimSun;'>
+            第七届“强网”拟态防御国际精英挑战赛设计安全赛--答辩演示
+        </h1>
+    </div>
+""", unsafe_allow_html=True)
 
 # 添加方案名称
 st.markdown("""
-### 方案名称
-**QHRSCS: 可防御漏洞攻击的四重化动态异构冗余分布式工业控制器架构**
-""")
+    </div>
+    <div class='centered'>
+        <h3>
+            <strong>QHRSCS: 可防御漏洞攻击的四重化动态异构冗余分布式工业控制器架构</strong>
+        </h3>
+    </div>
+""", unsafe_allow_html=True)
 
-# 添加团队信息
 st.markdown("""
-### 团队信息
-- **队伍名称**: 设计安全小分队
-- **队员**: 马卓、周石伟、强宇琛、陶羽石
-""")
+    <p>
+        <strong>队伍名称</strong>: 设计安全小分队<br>
+        <strong>队员</strong>: 马卓、周石伟、强宇琛、陶羽石
+    </p>
+""", unsafe_allow_html=True)
 
 # 添加分隔线
 st.markdown("---")
@@ -154,14 +190,14 @@ def display_dcs_status():
         with cols[i]:
             if dcs.is_online():
                 st.markdown(f"""
-                    <div style='padding: 10px; background-color: #e6ffe6; border-radius: 5px;'>
+                    <div style='padding: 10px; background: linear-gradient(45deg, #e6ffe6, #66cc66); border-radius: 5px;'>
                         <span style='color: green;'>{dcs.name}</span><br>
                         Status: Online
                     </div>
                     """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
-                    <div style='padding: 10px; background-color: #ffe6e6; border-radius: 5px;'>
+                    <div style='padding: 10px; background: linear-gradient(45deg, #ffe6e6, #ff6666); border-radius: 5px;'>
                         <span style='color: red;'>{dcs.name}</span><br>
                         Status: Offline
                     </div>
@@ -170,7 +206,7 @@ def display_dcs_status():
     # 显示冗余DCS状态
     with cols[4]:
         st.markdown(f"""
-            <div style='padding: 10px; background-color: #e6f3ff; border-radius: 5px;'>
+            <div style='padding: 10px; background: linear-gradient(45deg, #e6f3ff, #3399ff); border-radius: 5px;'>
                 <span style='color: blue;'>{redundant_dcs.name}</span><br>
                 Status: Standby
             </div>
@@ -181,35 +217,67 @@ status_container = st.empty()
 with status_container:
     display_dcs_status()
 
-# 添加分隔线
-st.markdown("---")
+# 在DCS状态区域下方添加联合表决状态
+vote_container = st.container()
 
 # Attack Simulation按钮
-attack_button = st.button("Simulate Attack")
+attack_button = st.button("Simulate a Random Attack")
 
+
+# 添加另一张图片
+st.image("https://cdn.jsdelivr.net/gh/htwzxwj/image/main_controller.png", caption="QHRSCS流程图")
 # 创建日志显示区域
 log_container = st.container()
 
 if attack_button:
     with log_container:
+        # 清空之前的日志
+        log_container.empty()
+        
         st.markdown("### Attack Simulation Log")
-        for attack in attack_types:
-            for dcs in dcs_modules:
-                status = dcs.receive_attack(attack)
-                st.write(status)
-                
-                if not dcs.is_online():
-                    st.write(f"{dcs.name} is offline. Replacing with {redundant_dcs.name}.")
-                    dcs_modules[dcs_modules.index(dcs)] = redundant_dcs
-                    st.write(f"Restarting {dcs.name}...")
-                    dcs.restart()
-                    redundant_dcs = dcs
-                    redundant_dcs.receive_attack(attack)
-                else:
-                    st.write(f"{dcs.name} online status: {dcs.is_online()}")
-                st.write("-" * 40)
-                
-                # 更新DCS状态显示
-                with status_container:
-                    status_container.empty()
-                    display_dcs_status()
+        attack = random.choice(attack_types)
+        for dcs in dcs_modules:
+            status = dcs.receive_attack(attack)
+            st.write(status)
+            
+            if not dcs.is_online():
+                st.write(f"{dcs.name} is offline. Replacing with {redundant_dcs.name}.")
+                dcs_modules[dcs_modules.index(dcs)] = redundant_dcs
+                st.write(f"Restarting {dcs.name}...")
+                dcs.restart()
+                redundant_dcs = dcs
+                redundant_dcs.receive_attack(attack)
+            else:
+                st.write(f"{dcs.name} online status: {dcs.is_online()}")
+            st.write("-" * 40)
+            
+            # 更新DCS状态显示
+            with status_container:
+                status_container.empty()
+                display_dcs_status()
+
+    # 更新联合表决状态
+    with vote_container:
+        # 计算离线的DCS数量
+        offline_count = sum(1 for dcs in dcs_modules if not dcs.is_online())
+        
+        # 设置状态和颜色
+        vote_status = "被攻击状态" if offline_count >= 2 else "安全控制"
+        vote_color = "#ff4444" if offline_count >= 2 else "#44ff44"
+        
+        st.markdown(f"""
+            <div style='
+                margin-top: 20px;
+                padding: 10px;
+                background: linear-gradient(145deg, {vote_color}22, {vote_color}44);
+                border-radius: 5px;
+                text-align: center;
+                font-weight: bold;
+                color: {vote_color};
+            '>
+                联合表决：{vote_status}
+            </div>
+        """, unsafe_allow_html=True)
+
+# 添加分隔线
+st.markdown("---")
